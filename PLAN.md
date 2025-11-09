@@ -193,15 +193,23 @@ Native macOS menu bar app for intelligent WiFi management with auto-join, monito
 - Manual testing on various networks
 
 ## File Structure
+
+**Actual Files (Currently Implemented):**
 ```
-Sources/WiFiClient/
-├── main.swift                    # Entry point ✓
-├── AppDelegate.swift             # App lifecycle ✓
+wifiClient/
+├── wifiClientApp.swift           # Entry point ✓
 ├── WiFiState.swift               # Shared state ✓
 ├── WiFiManager.swift             # CoreWLAN wrapper ✓
 ├── MenuBarView.swift             # Menu bar UI ✓
-├── AutoJoinEngine.swift          # Priority & auto-join
-├── NetworkPreferences.swift      # Preferences storage
+├── AutoJoinEngine.swift          # Basic auto-join (incomplete) ✓
+├── NetworkPriority.swift         # Preferences storage (simple) ✓
+├── LocationManager.swift         # Location permissions ✓
+└── ContentView.swift             # (unused placeholder)
+```
+
+**Planned Files (Still TODO):**
+```
+wifiClient/
 ├── ConnectionStrategy.swift      # Connection logic
 ├── ConnectionStatusView.swift    # Progress UI
 ├── SpeedMonitor.swift            # Speed tracking
@@ -217,58 +225,110 @@ Sources/WiFiClient/
 ├── QRCodeView.swift              # QR generation
 ├── PreferencesWindow.swift       # Settings UI
 └── Models/
-    ├── NetworkPriority.swift     # Priority model
+    ├── NetworkPriority.swift     # Priority model (needs expansion)
     ├── SpeedData.swift           # Speed metrics
     └── SecurityInfo.swift        # Security data
 ```
 
 ## Implementation Status
 
-### ✅ COMPLETED (MVP - Phases 1-2)
+### ✅ COMPLETED (Basic MVP)
 
-**Phase 1: Auto-Join Management**
-- ✓ Network priority system (High/Medium/Low/Never)
-- ✓ Auto-join logic based on priority + signal + speed
-- ✓ Connection progress tracking
-- ✓ Error explanations with actionable advice
+**Basic Infrastructure**
+- ✓ WiFiManager - CoreWLAN wrapper for scanning and connecting
+- ✓ WiFiState - Observable state management
+- ✓ MenuBarView - Basic menu bar UI with network list
+- ✓ LocationManager - Location permissions for WiFi scanning
+- ✓ NetworkPrefs - Simple auto-connect preferences (UserDefaults)
+- ✓ AutoJoinEngine - Basic auto-join logic (signal strength only)
 
-**Phase 2: Monitoring & Notifications**
-- ✓ Speed tracking with SpeedTester
-- ✓ Poor connection alerts via NotificationService
-- ✓ Historical speed data storage
-- ✓ Speed visualization in UI
-- ✓ Real-time quality indicators
+**Working Features**
+- ✓ Network scanning every 10 seconds
+- ✓ Display available networks with signal strength
+- ✓ Toggle auto-connect per network (checkmark UI)
+- ✓ Basic auto-join attempts every 15 seconds
+- ✓ Current network display
+- ✓ Manual network connection
 
-**Architecture**
-- ✓ Clean layered architecture (Core/Business/Data/UI)
-- ✓ All files under 70 lines
-- ✓ Observable pattern for UI updates
-- ✓ Proper separation of concerns
+### 🚧 TODO - Phase 1: Complete Auto-Join Management
 
-### 🚧 TODO (Future Phases)
+**Missing from Phase 1**
+- ❌ Priority levels (High/Medium/Low/Never) - only has boolean auto-connect
+- ❌ Manual ordering within priority groups
+- ❌ Blacklist functionality
+- ❌ Smart switching based on historical speed (only uses signal)
+- ❌ Connection progress/status tracking
+- ❌ Error explanations with actionable advice
+- ❌ Proper ConnectionStrategy.swift (logic is mixed into AutoJoinEngine)
+- ❌ ConnectionStatusView.swift for progress UI
 
-**Phase 3: Security Analysis**
-- Security analysis per network
-- Visual security warnings
-- Unsafe network alerts
+### 🚧 TODO - Phase 2: Monitoring & Notifications
 
-**Phase 4: Captive Portal**
-- Captive portal detection
-- Auto-fill for known portals
-- Learn from user input
+**All of Phase 2 Missing**
+- ❌ Speed tracking with SpeedTester
+- ❌ Poor connection alerts via NotificationService
+- ❌ Historical speed data storage (SQLite)
+- ❌ Speed visualization in UI
+- ❌ Real-time quality indicators
+- ❌ SpeedMonitor.swift
+- ❌ SpeedTest.swift
+- ❌ NotificationManager.swift
+- ❌ SpeedGraphView.swift
 
-**Phase 5: Credential Vault**
-- Password management UI
-- QR code generation/scanning
-- Secure sharing links
+### 🚧 TODO - Phase 3: Security Analysis
 
-**Phase 6: Advanced**
-- Network heatmaps
-- Crowdsourced database
-- VPN integration
+**All of Phase 3 Missing**
+- ❌ Security analysis per network (encryption type detection)
+- ❌ Visual security warnings
+- ❌ Unsafe network alerts
+- ❌ SecurityAnalyzer.swift
+- ❌ SecurityWarningView.swift
+- ❌ SecurityInfo.swift model
+
+### 🚧 TODO - Phase 4: Captive Portal
+
+**All of Phase 4 Missing**
+- ❌ Captive portal detection
+- ❌ Auto-fill for known portals
+- ❌ Learn from user input
+- ❌ CaptivePortalDetector.swift
+- ❌ PortalAutoFill.swift
+
+### 🚧 TODO - Phase 5: Credential Vault
+
+**All of Phase 5 Missing**
+- ❌ Password management UI
+- ❌ QR code generation/scanning
+- ❌ Secure sharing links
+- ❌ CredentialStore.swift
+- ❌ CredentialSharing.swift
+- ❌ QRCodeView.swift
+
+### 🚧 TODO - Phase 6: Advanced Features
+
+**All of Phase 6 Missing**
+- ❌ Network heatmaps
+- ❌ Crowdsourced database
+- ❌ VPN integration
+- ❌ HeatmapView.swift
+- ❌ NetworkDatabase.swift
+- ❌ VPNManager.swift
+
+## Current Status Summary
+
+**What Works:**
+- Basic WiFi scanning and network display
+- Simple on/off auto-connect toggle per network
+- Automatic reconnection attempts based on signal strength
+- Location permission handling
+
+**What's Missing:**
+- Everything described in the detailed plan above is still TODO
+- The current implementation is a very basic prototype
+- Need to complete Phase 1 (priority system, error handling) before moving to Phase 2
 
 ## Next Steps
-1. Run the app: `swift run`
-2. Test auto-join with different priority levels
-3. Monitor speed notifications
-4. Add Phase 3 (Security Analysis) when ready
+1. Complete Phase 1: Priority system (High/Medium/Low/Never)
+2. Add connection progress tracking and error explanations
+3. Implement historical speed tracking for smarter network selection
+4. Then move to Phase 2: Speed monitoring and notifications

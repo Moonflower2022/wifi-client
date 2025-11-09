@@ -9,6 +9,7 @@ class WiFiState {
     var prefs = NetworkPrefs.load()
     var isScanning = false
     var hasLocationPermission = false
+    var connectionStatus = ConnectionStatus()
 
     private let manager = WiFiManager()
     private var scanTimer: Timer?
@@ -51,15 +52,39 @@ class WiFiState {
     }
 
     func connect(to network: CWNetwork, password: String? = nil) {
-        print("Attempting to connect to \(network.ssid ?? "unknown")...")
+        let ssid = network.ssid ?? "unknown"
+        connectionStatus.connecting(to: ssid)
+        print("Attempting to connect to \(ssid)...")
+
         do {
             try manager.connect(to: network, password: password)
             print("Connection initiated successfully")
         } catch {
-            print("Connection error: \(error.localizedDescription)")
+            let msg = parseError(error)
+            connectionStatus.failed(ssid, reason: msg)
+            print("Connection error: \(msg)")
         }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             self.refresh()
+            if self.currentNetwork == ssid {
+                self.connectionStatus.connected(to: ssid)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    self.connectionStatus.reset()
+                }
+            }
         }
+    }
+
+    private func parseError(_ error: Error) -> String {
+        let desc = error.localizedDescription
+        if desc.contains("password") || desc.contains("authentication") {
+            return "Wrong password or authentication failed"
+        } else if desc.contains("timeout") {
+            return "Connection timeout"
+        } else if desc.contains("signal") {
+            return "Weak signal strength"
+        }
+        return "Connection failed"
     }
 }
